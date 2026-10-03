@@ -1,4 +1,14 @@
-# Project 1. HR AI Service
+# 고려대 세종캠퍼스 Document Agent 해커톤 스타터 코드
+
+고려대 세종캠퍼스 Document Agent 해커톤의 스타터 코드입니다. 주제는 **Document Workflow 기반 Agent 서비스 개발**입니다.
+
+- Playbook: https://ku-sejong-hackathon-playbook.vercel.app
+
+아래 HR AI Service는 예시입니다. 팀은 같은 구조로 팀이 정한 문서와 주제의 서비스를 만듭니다.
+
+---
+
+# 예시: HR AI Service
 
 Resume와 Job Description(JD)을 분석하여 지원자의 직무 적합도를 평가하는 AI 서비스입니다.
 
