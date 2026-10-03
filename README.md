@@ -22,35 +22,9 @@ Resume와 JD를 비교하여 최종 적합도와 추천 사항을 JSON 형태로
 본 프로젝트는 다음과 같은 AI Workflow로 구성됩니다.
 
 ```text
-Resume.pdf
-      │
-      ▼
-Resume Agent
-      │
-      ▼
-resume.json
-
-JobDescription.pdf
-      │
-      ▼
-JD Agent
-      │
-      ▼
-jd.json
-
-resume.json + jd.json
-      │
-      ▼
-Matching Builder
-      │
-      ▼
-Matching_Input.pdf
-      │
-      ▼
-Matching Agent
-      │
-      ▼
-matching_result.json
+Resume.pdf          → Resume Agent → resume.json ─┐
+                                                   ├→ Matching Builder → Matching_Input.pdf → Matching Agent → matching_result.json
+JobDescription.pdf  → JD Agent     → jd.json     ─┘
 ```
 
 ---
@@ -59,7 +33,6 @@ matching_result.json
 
 ```text
 hr-ai-service-workflow/
-│
 ├── app.py
 ├── streamlit_app.py
 ├── service.py
@@ -74,22 +47,22 @@ hr-ai-service-workflow/
 ├── requirements.txt
 ├── README.md
 ├── .gitignore
-├── .env
-│
+├── .env.example
+├── agent_configs/
+│   ├── Resume Agent.json
+│   ├── JD Agent.json
+│   └── Matching Agent.json
 ├── fonts/
-│     └── NanumGothic-Regular.ttf
-│
+│   └── NanumGothic-Regular.ttf
 ├── data/
-│     ├── Resume.pdf
-│     └── JobDescription.pdf
-│
+│   ├── Resume.pdf
+│   └── JobDescription.pdf
 ├── output/
-│     ├── resume.json
-│     ├── jd.json
-│     └── Matching_Input.pdf
-│
+│   ├── resume.json
+│   ├── jd.json
+│   └── Matching_Input.pdf
 └── result/
-      └── matching_result.json
+    └── matching_result.json
 ```
 
 ## Project Structure Description
@@ -121,8 +94,6 @@ hr-ai-service-workflow/
 본 프로젝트는 **Upstage Studio**에서 생성한 3개의 Agent를 사용하여 Resume 분석, Job Description 분석, 그리고 지원자와 채용 공고 간의 적합도 분석을 수행합니다.
 
 각 Agent는 하나의 역할(Role)만 담당하며, 분석 결과는 다음 Agent의 입력으로 활용됩니다.
-
----
 
 ---
 
@@ -267,15 +238,7 @@ matching_result.json
 Resume.pdf를 Studio Resume Agent로 분석하여
 
 ```text
-Resume.pdf
-
-↓
-
-Resume Agent
-
-↓
-
-resume.json
+Resume.pdf → Resume Agent → resume.json
 ```
 
 을 생성합니다.
@@ -287,15 +250,7 @@ resume.json
 JobDescription.pdf를 Studio JD Agent로 분석하여
 
 ```text
-JobDescription.pdf
-
-↓
-
-JD Agent
-
-↓
-
-jd.json
+JobDescription.pdf → JD Agent → jd.json
 ```
 
 을 생성합니다.
@@ -307,15 +262,7 @@ jd.json
 Resume JSON과 JD JSON을 하나의 문서로 변환합니다.
 
 ```text
-resume.json
-
-+
-
-jd.json
-
-↓
-
-Matching_Input.pdf
+resume.json + jd.json → Matching_Input.pdf
 ```
 
 Matching Agent는 이 PDF를 입력으로 사용합니다.
@@ -327,15 +274,7 @@ Matching Agent는 이 PDF를 입력으로 사용합니다.
 Matching_Input.pdf를 Studio Matching Agent로 분석합니다.
 
 ```text
-Matching_Input.pdf
-
-↓
-
-Matching Agent
-
-↓
-
-matching_result.json
+Matching_Input.pdf → Matching Agent → matching_result.json
 ```
 
 최종적으로 지원자의 적합도와 추천 사항을 생성합니다.
@@ -348,17 +287,11 @@ matching_result.json
 
 ```text
 output/
-
-resume.json
-
-jd.json
-
-Matching_Input.pdf
-
-
+├── resume.json
+├── jd.json
+└── Matching_Input.pdf
 result/
-
-matching_result.json
+└── matching_result.json
 ```
 
 ---
@@ -436,27 +369,7 @@ python app.py
 실행 순서는 다음과 같습니다.
 
 ```text
-Configuration
-
-↓
-
-Resume Analysis
-
-↓
-
-JD Analysis
-
-↓
-
-Matching Builder
-
-↓
-
-Matching Analysis
-
-↓
-
-Project Complete
+Configuration → Resume Analysis → JD Analysis → Matching Builder → Matching Analysis → Project Complete
 ```
 
 # Streamlit Application Guide
@@ -465,23 +378,10 @@ Project Complete
 
 사용자는 브라우저에서 Resume와 Job Description을 업로드하고, AI 분석 결과를 실시간으로 확인할 수 있습니다.
 
-
 # Streamlit Project Structure
 
 ```text
-streamlit_app.py
-
-↓
-
-Upload Files
-
-↓
-
-Call service.py
-
-↓
-
-Display Result
+streamlit_app.py → Upload Files → Call service.py → Display Result
 ```
 
 Streamlit은 사용자 인터페이스(UI)만 담당하며, 실제 비즈니스 로직은 `service.py`에서 수행합니다.
@@ -499,9 +399,7 @@ streamlit run streamlit_app.py
 실행 후 브라우저에서 다음과 같은 주소로 접속할 수 있습니다.
 
 ```text
-Local URL
-
-http://localhost:8501
+Local URL: http://localhost:8501
 ```
 
 ---
@@ -512,25 +410,12 @@ http://localhost:8501
 
 ```text
 AI Resume Matching Service
-
 ──────────────────────────────
-
-Resume Upload
-
-[ Choose File ]
-
+Resume Upload           [ Choose File ]
+Job Description Upload  [ Choose File ]
 ──────────────────────────────
-
-Job Description Upload
-
-[ Choose File ]
-
-──────────────────────────────
-
 [ Analyze ]
-
 ──────────────────────────────
-
 Matching Result
 ```
 
@@ -541,51 +426,10 @@ Matching Result
 사용자가 **Analyze** 버튼을 클릭하면 다음과 같은 순서로 분석이 수행됩니다.
 
 ```text
-Resume Upload
-
-↓
-
-Save File
-
-↓
-
-Resume Analysis
-
-↓
-
-Resume JSON
-
-↓
-
-JD Upload
-
-↓
-
-Save File
-
-↓
-
-JD Analysis
-
-↓
-
-JD JSON
-
-↓
-
-Matching PDF 생성
-
-↓
-
-Matching Analysis
-
-↓
-
-Matching Result
-
-↓
-
-Result Display
+1. Resume Upload → Save File → Resume Analysis → Resume JSON
+2. JD Upload     → Save File → JD Analysis     → JD JSON
+3. Matching PDF 생성 → Matching Analysis → Matching Result
+4. Result Display
 ```
 
 # Railway Deployment Guide
@@ -601,47 +445,11 @@ Railway에서 GitHub Repository를 연결하면 **자동으로 첫 번째 Build�
 실제 Railway의 배포 흐름은 다음과 같습니다.
 
 ```text
-GitHub Repository
-
-↓
-
-Repository 연결
-
-↓
-
-자동 Build & Deploy 시작
-
-↓
-
-(첫 번째 Deploy 실패 가능)
-
-↓
-
-Build Log 확인
-
-↓
-
-Environment Variables 등록
-
-↓
-
-Custom Start Command 설정
-
-↓
-
-Redeploy
-
-↓
-
-Running
-
-↓
-
-Public Domain 생성
-
-↓
-
-서비스 확인
+1. GitHub Repository 연결 → 자동 Build & Deploy 시작 (첫 번째 Deploy 실패 가능)
+2. Build Log 확인
+3. Environment Variables 등록 → Custom Start Command 설정
+4. Redeploy → Running
+5. Public Domain 생성 → 서비스 확인
 ```
 
 ---
@@ -667,27 +475,7 @@ Railway는 Repository를 연결하는 즉시 첫 번째 Build와 Deploy를 자�
 Railway는 Build 과정에서 다음과 같은 작업을 수행합니다.
 
 ```text
-Detected Python
-
-↓
-
-Create Virtual Environment
-
-↓
-
-pip install
-
-↓
-
-Copy Project
-
-↓
-
-Starting Container
-
-↓
-
-Streamlit Started
+Detected Python → Create Virtual Environment → pip install → Copy Project → Starting Container → Streamlit Started
 ```
 
 각 단계의 의미는 다음과 같습니다.
@@ -708,30 +496,18 @@ Streamlit Started
 프로젝트에서 사용하는 API Key와 Agent ID는 GitHub에 포함하지 않고 Railway Variables로 관리합니다.
 
 ```text
-Local
-
-.env
-
-↓
-
-Railway Variables
+Local .env → Railway Variables
 ```
 
 등록해야 하는 변수는 다음과 같습니다.
 
 ```text
 UPSTAGE_API_KEY
-
 RESUME_AGENT_ID
-
 RESUME_CONFIG_ID
-
 JD_AGENT_ID
-
 JD_CONFIG_ID
-
 MATCHING_AGENT_ID
-
 MATCHING_CONFIG_ID
 ```
 
@@ -754,19 +530,7 @@ Deploy가 완료되었다고 해서 바로 접속 가능한 것은 아닙니다.
 Railway에서는 Public Domain을 생성해야 합니다.
 
 ```text
-Deploy Success
-
-↓
-
-Networking
-
-↓
-
-Generate Domain
-
-↓
-
-Public URL 생성
+Deploy Success → Networking → Generate Domain → Public URL 생성
 ```
 
 예시
@@ -776,8 +540,6 @@ https://hr-ai-service.up.railway.app
 ```
 
 생성된 Public URL을 브라우저에서 열어 서비스를 확인합니다.
-
-
 
 ---
 
